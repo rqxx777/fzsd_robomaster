@@ -1,0 +1,308 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
+
+WorldInfo {
+  contactProperties [
+    ContactProperties {
+      material1 "gripper_material"
+      material2 "block_material"
+      coulombFriction [
+        1.5
+      ]
+    }
+    ContactProperties {
+      material1 "gripper_material"
+      coulombFriction [
+        0.8
+      ]
+      bounce 0.1
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.30555815323507124 0.3106689971080755 -0.9000661026988158 1.6593701518999422
+  position 0.22216975819910037 1.2104594654647949 1.3094864721686421
+}
+Background {
+  skyColor [
+    0.6 0.7 0.5
+    0 0 0
+    0 0 0
+    0 0 0
+    0 0 0
+    0 0 0
+    0 0 0
+    0 0 0
+  ]
+}
+DirectionalLight {
+  ambientIntensity 1
+  direction 0.1 -0.5 0.3
+  castShadows TRUE
+}
+Robot {
+  children [
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+      }
+      device [
+        RotationalMotor {
+          name "motor1"
+        }
+      ]
+      endPoint Solid {
+        children [
+          Solid {
+            translation 0 0 0.1
+            children [
+              Shape {
+                appearance Appearance {
+                  material Material {
+                    emissiveColor 0.6 0.6 0.6
+                  }
+                }
+                geometry Cylinder {
+                  height 0.2
+                  radius 0.05
+                }
+              }
+            ]
+            name "base"
+          }
+          HingeJoint {
+            jointParameters HingeJointParameters {
+              axis 0 1 0
+              anchor 0 0 0.2
+            }
+            device [
+              RotationalMotor {
+                name "motor2"
+              }
+            ]
+            endPoint Solid {
+              rotation 0 1 0 0
+              children [
+                Solid {
+                  translation 0 0 0.3
+                  children [
+                    Shape {
+                      geometry Cylinder {
+                        height 0.2
+                        radius 0.05
+                      }
+                    }
+                  ]
+                }
+                HingeJoint {
+                  jointParameters HingeJointParameters {
+                    axis 0 1 0
+                    anchor 0 0 0.4
+                  }
+                  device [
+                    RotationalMotor {
+                      name "motor3"
+                    }
+                  ]
+                  endPoint Solid {
+                    translation 5.551115123125783e-16 0 2.609024107869118e-15
+                    rotation 0 1 0 0
+                    children [
+                      HingeJoint {
+                        jointParameters HingeJointParameters {
+                          axis 0 0 1
+                        }
+                        device [
+                          RotationalMotor {
+                            name "motor4"
+                          }
+                        ]
+                        endPoint Solid {
+                          children [
+                            HingeJoint {
+                              jointParameters HingeJointParameters {
+                                axis 0 1 0
+                                anchor 0 0 0.68
+                              }
+                              device [
+                                RotationalMotor {
+                                  name "motor5"
+                                }
+                              ]
+                              endPoint Solid {
+                                rotation 0 1 0 0
+                                children [
+                                  HingeJoint {
+                                    jointParameters HingeJointParameters {
+                                      axis 0 0 1
+                                    }
+                                    device [
+                                      RotationalMotor {
+                                        name "motor6"
+                                      }
+                                    ]
+                                    endPoint VacuumGripper {
+                                      translation 0 0 0.7699999999999583
+                                      children [
+                                        Shape {
+                                          appearance Appearance {
+                                            material Material {
+                                            }
+                                          }
+                                          geometry Box {
+                                            size 0.08 0.08 0.02
+                                          }
+                                        }
+                                      ]
+                                      name "gripper"
+                                      contactMaterial "gripper_material"
+                                      boundingObject Box {
+                                        size 0.08 0.08 0.02
+                                      }
+                                      physics Physics {
+                                        mass 0.5
+                                      }
+                                    }
+                                  }
+                                  Solid {
+                                    translation 0 0 0.74
+                                    rotation 0 0 1 -1.5707953071795862
+                                    children [
+                                      Shape {
+                                        geometry Cylinder {
+                                          height 0.05
+                                          radius 0.05
+                                        }
+                                      }
+                                    ]
+                                    name "pole4"
+                                  }
+                                  Solid {
+                                    translation 0 0 0.68
+                                    rotation 0.5773509358560258 -0.577349935856137 0.577349935856137 2.09439
+                                    children [
+                                      Shape {
+                                        geometry Cylinder {
+                                          height 0.1
+                                          radius 0.05
+                                        }
+                                      }
+                                    ]
+                                    name "link4"
+                                  }
+                                ]
+                                name "joint5"
+                              }
+                            }
+                            Solid {
+                              translation 0 0 0.63
+                              children [
+                                Shape {
+                                  geometry Cylinder {
+                                    height 0.05
+                                    radius 0.05
+                                  }
+                                }
+                              ]
+                              name "pole3"
+                            }
+                            Solid {
+                              translation 0 0 0.6
+                              children [
+                                Shape {
+                                  geometry Cylinder {
+                                    height 0.02
+                                    radius 0.07
+                                  }
+                                }
+                              ]
+                              name "link3"
+                            }
+                          ]
+                          name "joint4"
+                        }
+                      }
+                      Solid {
+                        translation 0 0 0.5
+                        rotation 0 0 1 -1.5707953071795862
+                        children [
+                          Shape {
+                            geometry Cylinder {
+                              height 0.2
+                              radius 0.05
+                            }
+                          }
+                        ]
+                        name "pole2"
+                      }
+                      Solid {
+                        translation 0 0 0.4
+                        rotation 0.5773509358560258 -0.577349935856137 0.577349935856137 2.09439
+                        children [
+                          Shape {
+                            geometry Cylinder {
+                              height 0.1
+                              radius 0.05
+                            }
+                          }
+                        ]
+                        name "link2"
+                      }
+                    ]
+                    name "joint3"
+                    contactMaterial "block_material"
+                    boundingObject Box {
+                      size 0.1 0.1 0.1
+                    }
+                    physics Physics {
+                    }
+                  }
+                }
+                Solid {
+                  translation 5.19723e-15 0 0.2
+                  rotation 0.5773509358560258 -0.577349935856137 0.577349935856137 2.09439
+                  children [
+                    Shape {
+                      geometry Cylinder {
+                        height 0.1
+                        radius 0.05
+                      }
+                    }
+                  ]
+                  name "link1"
+                }
+              ]
+              name "joint2"
+            }
+          }
+        ]
+        name "joint1"
+      }
+    }
+  ]
+  controller "arm_controller"
+}
+Floor {
+}
+Solid {
+  translation 0.46 0 0.05
+  children [
+    Shape {
+      appearance Appearance {
+        material Material {
+        }
+      }
+      geometry Box {
+        size 0.1 0.1 0.1
+      }
+    }
+  ]
+  contactMaterial "block_material"
+  boundingObject Box {
+    size 0.1 0.1 0.1
+  }
+  physics Physics {
+    mass 0.1
+  }
+}
