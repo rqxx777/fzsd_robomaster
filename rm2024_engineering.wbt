@@ -1,0 +1,516 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/floors/protos/Floor.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation 0.3483626831632543 -0.031183145406068834 -0.9368409963392306 3.3090377383532465
+  position 3.4281860325506326 -0.5904753821019796 3.130383624289351
+}
+TexturedBackground {
+  luminosity 2
+}
+TexturedBackgroundLight {
+}
+Floor {
+}
+Solid {
+  translation 0.09 -0.04 1.5
+  rotation 0.9381520490724147 -0.2581171217276838 -0.23075156400823316 2.6159376475382703
+  children [
+    DEF ball Shape {
+      appearance PBRAppearance {
+        baseColor 0.5 0.4 1
+        roughness 1
+      }
+      geometry Sphere {
+        radius 0.07
+      }
+    }
+  ]
+  name "ball"
+  boundingObject USE ball
+  physics Physics {
+    density 900
+  }
+}
+Robot {
+  translation 0 0 0.13185
+  rotation 0 0 1 -1.5707953071795862
+  children [
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 7.837359543602918e-16
+        anchor 0.12 0.0900007 -0.0899979
+      }
+      device [
+        RotationalMotor {
+          name "motor4"
+        }
+      ]
+      endPoint Solid {
+        translation 0.12 0.0900007 -0.0899979
+        rotation 0.5773509358554695 0.577348935855628 0.5773509358554704 2.094400000000053
+        children [
+          DEF wheel4 Shape {
+            appearance PBRAppearance {
+            }
+            geometry Cylinder {
+              height 0.02
+              radius 0.025
+            }
+          }
+        ]
+        name "solid(4)"
+        boundingObject USE wheel4
+        physics Physics {
+        }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position -1.5118914647118338
+        anchor -0.12 0.09 -0.09
+      }
+      device [
+        RotationalMotor {
+          name "motor3"
+        }
+      ]
+      endPoint Solid {
+        translation -0.12 0.09 -0.09
+        rotation 0.029436137668657072 -0.9991331084630679 -0.029437142729540688 1.5716625271882476
+        children [
+          DEF wheel3 Shape {
+            appearance PBRAppearance {
+            }
+            geometry Cylinder {
+              height 0.02
+              radius 0.025
+            }
+          }
+        ]
+        name "solid(3)"
+        boundingObject USE wheel3
+        physics Physics {
+        }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 0.9110618695410418
+        anchor 0.12 -0.09 -0.0899997
+      }
+      device [
+        RotationalMotor {
+          name "motor1"
+        }
+      ]
+      endPoint Solid {
+        translation 0.12 -0.09 -0.0899997
+        rotation 0.687253115044493 0.23529826279751187 0.687253871132141 2.6794063886077844
+        children [
+          DEF wheel1 Shape {
+            appearance PBRAppearance {
+            }
+            geometry Cylinder {
+              height 0.02
+              radius 0.025
+            }
+          }
+        ]
+        boundingObject USE wheel1
+        physics Physics {
+        }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 0.015846021405373202
+        anchor -0.12 -0.09 -0.09
+      }
+      device [
+        RotationalMotor {
+          name "motor2"
+        }
+      ]
+      endPoint Solid {
+        translation -0.12 -0.09 -0.09
+        rotation 0.5803764231211622 -0.5712498804794222 -0.5803764136638664 2.1035680569100643
+        children [
+          DEF wheel2 Shape {
+            appearance PBRAppearance {
+            }
+            geometry Cylinder {
+              height 0.02
+              radius 0.025
+            }
+          }
+        ]
+        name "solid(2)"
+        boundingObject USE wheel2
+        physics Physics {
+        }
+      }
+    }
+    Solid {
+      translation 0 0 -7.840229690608824e-06
+      children [
+        SliderJoint {
+          jointParameters JointParameters {
+          }
+          device [
+            PositionSensor {
+              name "joint1sensor"
+            }
+            LinearMotor {
+              name "joint1motor"
+              maxPosition 0.2
+            }
+          ]
+          endPoint Solid {
+            translation 1.8480965593089275e-17 -8.2748303572552e-18 -1.3877787807814457e-17
+            rotation -0.10482905494443318 0.9944902559801463 2.116551954877156e-16 3.141748680111308e-16
+            children [
+              Solid {
+                translation -1.2821573100680218e-09 6.789737893739063e-10 0.10736093660323884
+                rotation 0.6114820423310474 0.7799512729522551 -0.13328812297728537 5.5360336118047524e-11
+                children [
+                  HingeJoint {
+                    jointParameters HingeJointParameters {
+                      position -0.23232000000000014
+                      axis 0 0 1
+                    }
+                    device [
+                      RotationalMotor {
+                        name "joint2motor"
+                        minPosition -6
+                        maxPosition 6
+                      }
+                      PositionSensor {
+                        name "joint2sensor"
+                      }
+                    ]
+                    endPoint Solid {
+                      translation 0.09731348672954195 -0.023023581401237853 0
+                      rotation 0 0 -1 0.2323199999999999
+                      children [
+                        Solid {
+                          translation 0.1 0 0
+                          children [
+                            HingeJoint {
+                              jointParameters HingeJointParameters {
+                                position 1.9127999999999994
+                                axis 0 0 1
+                              }
+                              device [
+                                RotationalMotor {
+                                  name "joint3motor"
+                                  minPosition -6
+                                  maxPosition 6
+                                }
+                                PositionSensor {
+                                  name "joint3sensor"
+                                }
+                              ]
+                              endPoint Solid {
+                                translation -0.03353753937130314 0.09420845743837593 0
+                                rotation 0 0 1 1.9127999999999994
+                                children [
+                                  Solid {
+                                    translation 0.1 0 0
+                                    children [
+                                      HingeJoint {
+                                        jointParameters HingeJointParameters {
+                                          position 1.6732799999999994
+                                          axis 0 0 1
+                                        }
+                                        device [
+                                          RotationalMotor {
+                                            name "joint4motor"
+                                            minPosition -6
+                                            maxPosition 6
+                                          }
+                                          PositionSensor {
+                                            name "joint4sensor"
+                                          }
+                                        ]
+                                        endPoint Solid {
+                                          translation -0.005115218568634941 0.0497376571522533 0
+                                          rotation 0 0 0.9999999999999999 1.6732799999999992
+                                          children [
+                                            Solid {
+                                              translation 0.05 0 0
+                                              rotation 1 0 0 1.5708
+                                              children [
+                                                HingeJoint {
+                                                  jointParameters HingeJointParameters {
+                                                    position -0.36
+                                                    axis 0 0 1
+                                                  }
+                                                  device [
+                                                    PositionSensor {
+                                                      name "joint5sensor"
+                                                    }
+                                                    RotationalMotor {
+                                                      name "joint5motor"
+                                                      minPosition -6
+                                                      maxPosition 6
+                                                    }
+                                                  ]
+                                                  endPoint Solid {
+                                                    translation 0.02807690471033805 -0.010568226998252698 0
+                                                    rotation 0 0 -1 0.3599999999999996
+                                                    children [
+                                                      Solid {
+                                                        translation 0.06 5.01882e-08 -5.01879e-08
+                                                        rotation 0.5773509358554485 0.5773489358556708 0.5773509358554485 2.0944
+                                                        children [
+                                                          HingeJoint {
+                                                            jointParameters HingeJointParameters {
+                                                              axis 0 0 1
+                                                            }
+                                                            device [
+                                                              PositionSensor {
+                                                                name "joint6sensor"
+                                                              }
+                                                              RotationalMotor {
+                                                                name "joint6motor"
+                                                                minPosition -6
+                                                                maxPosition 6
+                                                              }
+                                                            ]
+                                                            endPoint Solid {
+                                                              translation 0 0 0.02
+                                                              children [
+                                                                Solid {
+                                                                  translation 0 -0.01 0
+                                                                  children [
+                                                                    Shape {
+                                                                      appearance Appearance {
+                                                                        material Material {
+                                                                          diffuseColor 0.8 0.8 0.2
+                                                                        }
+                                                                      }
+                                                                      geometry Cone {
+                                                                        bottomRadius 0.008
+                                                                        height 0.02
+                                                                      }
+                                                                    }
+                                                                  ]
+                                                                  name "rod6end2"
+                                                                }
+                                                                Solid {
+                                                                  translation 0 0.01 0
+                                                                  children [
+                                                                    Shape {
+                                                                      appearance Appearance {
+                                                                        material Material {
+                                                                          diffuseColor 0.8 0.2 0.8
+                                                                        }
+                                                                      }
+                                                                      geometry Cone {
+                                                                        bottomRadius 0.008
+                                                                        height 0.02
+                                                                      }
+                                                                    }
+                                                                  ]
+                                                                  name "rod6end1"
+                                                                }
+                                                              ]
+                                                              name "rod6"
+                                                            }
+                                                          }
+                                                          DEF rod6 Shape {
+                                                            appearance Appearance {
+                                                              material Material {
+                                                                diffuseColor 0.941176 0.392157 0.368627
+                                                              }
+                                                            }
+                                                            geometry Cylinder {
+                                                              height 0.02
+                                                              radius 0.02
+                                                            }
+                                                          }
+                                                        ]
+                                                        name "rod5end"
+                                                        boundingObject USE rod6
+                                                      }
+                                                      DEF link6 Shape {
+                                                        appearance Appearance {
+                                                          material Material {
+                                                            diffuseColor 0.5 0.5 0.5
+                                                          }
+                                                        }
+                                                        geometry Box {
+                                                          size 0.11 0.02 0.02
+                                                        }
+                                                      }
+                                                    ]
+                                                    name "rod5"
+                                                    boundingObject USE link6
+                                                  }
+                                                }
+                                                DEF rod5 Shape {
+                                                  appearance Appearance {
+                                                    material Material {
+                                                      diffuseColor 0.941176 0.392157 0.368627
+                                                    }
+                                                  }
+                                                  geometry Cylinder {
+                                                    height 0.04
+                                                    radius 0.02
+                                                  }
+                                                }
+                                              ]
+                                              name "rod4end"
+                                              boundingObject USE rod5
+                                            }
+                                            DEF link4 Shape {
+                                              appearance Appearance {
+                                                material Material {
+                                                  diffuseColor 0.5 0.5 0.5
+                                                }
+                                              }
+                                              geometry Box {
+                                                size 0.1 0.02 0.02
+                                              }
+                                            }
+                                          ]
+                                          name "rod4"
+                                          boundingObject USE link4
+                                        }
+                                      }
+                                      DEF rod3 Shape {
+                                        appearance Appearance {
+                                          material Material {
+                                            diffuseColor 0.941176 0.392157 0.368627
+                                          }
+                                        }
+                                        geometry Cylinder {
+                                          height 0.03
+                                          radius 0.04
+                                        }
+                                      }
+                                    ]
+                                    name "rod3end"
+                                    boundingObject USE rod3
+                                  }
+                                  DEF link3 Shape {
+                                    appearance Appearance {
+                                      material Material {
+                                        diffuseColor 0.5 0.5 0.5
+                                      }
+                                    }
+                                    geometry Box {
+                                      size 0.2 0.02 0.02
+                                    }
+                                  }
+                                ]
+                                name "rod3"
+                                boundingObject USE link3
+                              }
+                            }
+                            DEF rod2 Shape {
+                              appearance Appearance {
+                                material Material {
+                                  diffuseColor 0.941176 0.392157 0.368627
+                                }
+                              }
+                              geometry Cylinder {
+                                height 0.03
+                                radius 0.04
+                              }
+                            }
+                          ]
+                          name "rod2end"
+                          boundingObject USE rod2
+                        }
+                        DEF link2 Shape {
+                          appearance Appearance {
+                            material Material {
+                              diffuseColor 0.5 0.5 0.5
+                            }
+                          }
+                          geometry Box {
+                            size 0.2 0.02 0.02
+                          }
+                        }
+                      ]
+                      name "rod2"
+                      boundingObject USE link2
+                    }
+                  }
+                  DEF rod1 Shape {
+                    appearance Appearance {
+                      material Material {
+                        diffuseColor 0.941176 0.392157 0.368627
+                      }
+                    }
+                    geometry Cylinder {
+                      height 0.03
+                      radius 0.04
+                    }
+                  }
+                ]
+                name "rod1end"
+                boundingObject USE rod1
+                physics Physics {
+                }
+              }
+              DEF link0 Shape {
+                appearance Appearance {
+                  material Material {
+                    diffuseColor 0.5 0.5 0.5
+                  }
+                }
+                geometry Box {
+                  size 0.03 0.03 0.2
+                }
+              }
+            ]
+            name "rod1"
+            boundingObject Box {
+              size 0.05 0.05 0.2
+            }
+          }
+        }
+        DEF link1 Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.15 0.670588 0.705882
+            }
+          }
+          geometry Box {
+            size 0.05 0.05 0.2
+          }
+        }
+      ]
+      name "rod1_start"
+      boundingObject USE link1
+    }
+    Solid {
+      translation 0 0 -0.06
+      children [
+        DEF bot Shape {
+          appearance PBRAppearance {
+            baseColor 1 0.5 1
+            roughness 1
+          }
+          geometry Box {
+            size 0.2 0.2 0.08
+          }
+        }
+      ]
+      name "solid(1)"
+      boundingObject USE bot
+    }
+  ]
+  name "engineering"
+  translationStep 1e-05
+  rotationStep 1e-05
+  controller "rm2024_engineering"
+}
