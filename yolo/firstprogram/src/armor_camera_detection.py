@@ -4,7 +4,7 @@ from ultralytics import YOLO
 def main():
     # 1. 加载训练好的YOLO模型
     try:
-        model = YOLO("armor2.pt")  # 加载模型
+        model = YOLO("best.pt")  # 加载模型
         print("模型加载成功")
     except Exception as e:
         print(f"模型加载失败: {e}")
