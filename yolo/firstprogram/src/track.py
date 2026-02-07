@@ -96,7 +96,7 @@ def main():
         ekf_trackers = {}
         
         print("开始EKF预测跟踪...")
-        print("EKF预测数据将自动保存到CSV文件中，可用于foxglove可视化")
+        print("EKF预测数据将自动保存到CSV和JSON文件中，可用于foxglove可视化")
         
         while cap.isOpened():
             ret, frame = cap.read()
@@ -172,7 +172,7 @@ def main():
     cv2.destroyAllWindows()
     
     print(f"EKF预测跟踪完成。结果保存到: {output_path}")
-    print(f"EKF预测数据已保存到CSV文件，可用于foxglove可视化")
+    print(f"EKF预测数据已保存到CSV和JSON文件，可用于foxglove可视化")
 
 if __name__ == "__main__":
     main()

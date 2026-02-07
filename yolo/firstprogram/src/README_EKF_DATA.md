@@ -59,23 +59,33 @@ print('数据记录器存在:', os.path.exists('firstprogram/src/ekf_data_logger
 - "输出视频: firstprogram/src/detected_demo.mp4"
 - "注意：请从/home/xdc/fzsd_robomaster/yolo目录运行此脚本"
 - "开始EKF预测跟踪..."
-- "EKF预测数据将自动保存到CSV文件中，可用于foxglove可视化"
+- "EKF预测数据将自动保存到CSV和JSON文件中，可用于foxglove可视化"
 - 实时显示检测和跟踪画面
 - 按'q'键退出程序
 
 程序结束后会显示：
 - "EKF预测跟踪完成。结果保存到: [视频文件路径]"
-- "EKF预测数据已保存到CSV文件，可用于foxglove可视化"
+- "EKF预测数据已保存到CSV和JSON文件，可用于foxglove可视化"
 - "EKF数据记录器已初始化，数据将保存到: [CSV文件路径]" (程序开始时)
-- "EKF预测数据已保存到: [CSV文件路径]" (程序结束时)
+- "EKF预测数据已保存到CSV文件: [CSV文件路径]" (程序结束时)
+- "已自动生成JSON文件: [JSON文件路径]" (程序结束时)
 
 ## 数据文件
 
+### 生成的文件
+
+程序运行后会生成两个数据文件，位于 `firstprogram/src/` 目录下：
+
+1. **CSV文件**：`ekf_predictions_YYYYMMDD_HHMMSS.csv`
+   - 原始数据格式，易于查看和导入
+   - 包含完整的预测和测量数据
+
+2. **JSON文件**：`ekf_predictions_YYYYMMDD_HHMMSS.json`
+   - 自动从CSV转换生成
+   - 结构化数据格式，易于程序处理
+   - 包含类型转换后的数据
+
 ### CSV文件格式
-
-生成的CSV文件位于 `firstprogram/src/` 目录下，文件名格式为 `ekf_predictions_YYYYMMDD_HHMMSS.csv`。
-
-CSV文件包含以下列：
 
 | 列名 | 类型 | 描述 |
 |------|------|------|
@@ -100,28 +110,41 @@ frame_number,timestamp,track_id,pred_x,pred_y,meas_x,meas_y,frame_time
 
 ## Foxglove可视化
 
-### 方法1：直接导入CSV
+### 方法1：导入CSV文件
 
 1. 打开Foxglove Studio
 2. 点击"Add Panel" → "Table"
 3. 在Table面板中，点击"Import CSV"
-4. 选择生成的CSV文件
+4. 选择生成的CSV文件 (`ekf_predictions_YYYYMMDD_HHMMSS.csv`)
 5. 数据将显示在表格中，可以进一步创建图表
 
-### 方法2：使用Plot面板
+### 方法2：导入JSON文件
+
+1. 打开Foxglove Studio
+2. 点击"Add Panel" → "Table"
+3. 在Table面板中，点击"Import JSON"
+4. 选择生成的JSON文件 (`ekf_predictions_YYYYMMDD_HHMMSS.json`)
+5. JSON数据将自动解析并显示
+
+### 方法3：使用Plot面板
 
 1. 添加"Plot"面板
-2. 配置数据源为CSV文件
+2. 配置数据源为CSV或JSON文件
 3. 设置X轴为`frame_time`或`timestamp`
 4. 设置Y轴为`pred_x`或`pred_y`
 5. 按`track_id`分组显示不同目标的轨迹
 
-### 方法3：创建2D可视化
+### 方法4：创建2D可视化
 
 1. 添加"Image"面板（如果需要显示视频）
 2. 添加"Scatter Plot"面板显示2D位置
 3. 配置X轴为`pred_x`，Y轴为`pred_y`
 4. 使用`track_id`作为颜色编码
+
+**推荐使用JSON格式**，因为：
+- 数据类型已正确转换（数字、字符串、空值）
+- 结构化格式更易于Foxglove解析
+- 自动生成，无需手动转换
 
 ## 高级用法
 
@@ -145,20 +168,7 @@ with create_ekf_datalogger(output_dir="./data", filename_prefix="my_predictions"
     )
 ```
 
-### 导出为JSON格式
 
-```python
-from ekf_data_logger import EKFDatalogger
-
-# 创建记录器
-logger = EKFDatalogger()
-# ...记录数据...
-logger.close()
-
-# 导出为JSON
-json_path = logger.export_to_json()
-print(f"JSON文件已保存: {json_path}")
-```
 
 ### 数据转换脚本示例
 
@@ -236,9 +246,10 @@ print("转换完成！")
 
 ### 支持其他格式
 
-数据记录器已支持JSON导出，可以轻松扩展支持其他格式：
+数据记录器已支持JSON和ROS bag导出，可以轻松扩展支持其他格式：
+- JSON（默认自动导出，用于Foxglove可视化）
+- ROS bag（用于机器人系统，需要ROS环境）
 - Parquet（用于大数据集）
-- ROS bag（用于机器人系统）
 - SQLite（用于结构化查询）
 
 ## 联系与支持
