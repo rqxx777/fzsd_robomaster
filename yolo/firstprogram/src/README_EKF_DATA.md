@@ -246,9 +246,9 @@ print("转换完成！")
 
 ### 支持其他格式
 
-数据记录器已支持JSON和ROS bag导出，可以轻松扩展支持其他格式：
+数据记录器已支持JSON和ROS2 bag (rosbag2)导出，可以轻松扩展支持其他格式：
 - JSON（默认自动导出，用于Foxglove可视化）
-- ROS bag（用于机器人系统，需要ROS环境）
+- ROS2 bag (rosbag2)（用于机器人系统，需要ROS2环境）
 - Parquet（用于大数据集）
 - SQLite（用于结构化查询）
 

@@ -4,7 +4,7 @@ from ultralytics import YOLO
 def main():
     # 1. 加载训练好的YOLO模型
     try:
-        model = YOLO("best.pt")  # 加载模型
+        model = YOLO("firstprogram/best.pt")  # 加载模型
         print("模型加载成功")
     except Exception as e:
         print(f"模型加载失败: {e}")
@@ -29,7 +29,7 @@ def main():
             # 4. 使用模型进行预测
             results = model.predict(
                 source=frame,  # 输入帧
-                conf=0.5,      # 置信度阈值
+                conf=0.3,      # 置信度阈值
                 imgsz=640,     # 推理尺寸
                 verbose=False  # 不显示详细信息
             )

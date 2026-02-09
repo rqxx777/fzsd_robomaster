@@ -91,12 +91,13 @@ def main():
     out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
     
     # 初始化EKF数据记录器
-    with create_ekf_datalogger(output_dir="firstprogram/src", filename_prefix="ekf_predictions") as data_logger:
+    with create_ekf_datalogger(output_dir="firstprogram/src", filename_prefix="ekf_predictions", export_rosbag=True) as data_logger:
         # 存储每个跟踪目标的EKF实例
         ekf_trackers = {}
         
         print("开始EKF预测跟踪...")
         print("EKF预测数据将自动保存到CSV和JSON文件中，可用于foxglove可视化")
+        print("ROS2 bag (rosbag2) 导出功能已启用，数据将自动保存为.db3格式")
         
         while cap.isOpened():
             ret, frame = cap.read()

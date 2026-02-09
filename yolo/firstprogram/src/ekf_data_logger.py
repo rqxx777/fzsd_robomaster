@@ -14,7 +14,7 @@ class EKFDatalogger:
         Args:
             output_dir: 输出目录路径
             filename_prefix: 文件名前缀
-            export_rosbag: 是否自动导出ROS bag格式（默认False）
+            export_rosbag: 是否自动导出ROS2 bag (rosbag2)格式（默认False）
         """
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -44,7 +44,7 @@ class EKFDatalogger:
         self.export_rosbag = export_rosbag
         print(f"EKF数据记录器已初始化，数据将保存到: {self.filename}")
         if export_rosbag:
-            print("ROS bag导出功能已启用")
+            print("ROS2 bag (rosbag2)导出功能已启用")
     
     def log_prediction(self, track_id, pred_x, pred_y, meas_x=None, meas_y=None):
         """
@@ -88,7 +88,7 @@ class EKFDatalogger:
             # 自动导出JSON格式
             self._auto_export_json()
             
-            # 如果启用，自动导出ROS bag格式
+            # 如果启用，自动导出ROS2 bag格式
             if self.export_rosbag:
                 self._auto_export_rosbag()
     
@@ -155,31 +155,33 @@ class EKFDatalogger:
     
     def export_to_rosbag(self, output_path=None, topic_prefix="/ekf_tracking"):
         """
-        将数据导出为ROS bag格式
+        将数据导出为ROS2 bag格式 (rosbag2)
         
         Args:
-            output_path: 输出bag文件路径（默认使用CSV文件名，扩展名为.bag）
+            output_path: 输出bag文件路径（默认使用CSV文件名，扩展名为.db3）
             topic_prefix: ROS话题前缀（默认"/ekf_tracking"）
             
         Returns:
             str: 导出的bag文件路径，如果失败则返回None
         """
         try:
-            # 尝试导入ROS相关模块
-            import rosbag
+            # 尝试导入ROS2相关模块
+            import rclpy
+            from rclpy.serialization import serialize_message
+            from rosbag2_py import SequentialWriter, StorageOptions, ConverterOptions, TopicMetadata
             from geometry_msgs.msg import PoseStamped
             from std_msgs.msg import Header
-            import rospy
+            from rclpy.time import Time
         except ImportError as e:
-            print(f"错误: 无法导入ROS模块 - {e}")
-            print("请确保ROS环境已正确设置，并安装了必要的Python包:")
-            print("1. 确保已安装ROS (Noetic或更高版本)")
-            print("2. 确保已安装python3-rosbag和python3-rospy")
-            print("3. 确保在正确的ROS环境中运行")
+            print(f"错误: 无法导入ROS2模块 - {e}")
+            print("请确保ROS2环境已正确设置，并安装了必要的Python包:")
+            print("1. 确保已安装ROS2 (Humble或更高版本)")
+            print("2. 确保已安装rosbag2-py和rclpy")
+            print("3. 确保在正确的ROS2环境中运行")
             return None
         
         if output_path is None:
-            output_path = self.filename.with_suffix('.bag')
+            output_path = self.filename.with_suffix('.db3')
         
         # 检查CSV文件是否存在且不为空
         if not self.filename.exists():
@@ -215,78 +217,113 @@ class EKFDatalogger:
                 print("警告: 没有数据可导出")
                 return None
             
-            print(f"正在导出ROS bag格式: {output_path}")
+            print(f"正在导出ROS2 bag格式 (rosbag2): {output_path}")
             
-            # 创建rosbag文件
-            with rosbag.Bag(str(output_path), 'w') as bag:
-                for row in data:
-                    # 创建时间戳（将Unix时间戳转换为ROS时间）
-                    timestamp = rospy.Time.from_sec(float(row['timestamp']))
-                    
-                    # 创建PoseStamped消息
-                    pose_msg = PoseStamped()
-                    pose_msg.header = Header()
-                    pose_msg.header.stamp = timestamp
-                    pose_msg.header.frame_id = "map"  # 可以根据需要修改
-                    
-                    # 设置位置（预测位置）
-                    pose_msg.pose.position.x = float(row['pred_x'])
-                    pose_msg.pose.position.y = float(row['pred_y'])
-                    pose_msg.pose.position.z = 0.0  # 2D跟踪，z=0
-                    
-                    # 设置方向（单位四元数，无旋转）
-                    pose_msg.pose.orientation.x = 0.0
-                    pose_msg.pose.orientation.y = 0.0
-                    pose_msg.pose.orientation.z = 0.0
-                    pose_msg.pose.orientation.w = 1.0
-                    
-                    # 创建话题名称，包含跟踪ID
-                    track_id = int(row['track_id'])
-                    topic_name = f"{topic_prefix}/target_{track_id}/pose"
-                    
-                    # 写入bag
-                    bag.write(topic_name, pose_msg, timestamp)
-                    
-                    # 如果有测量数据，也写入测量位置
-                    if row['meas_x'] is not None and row['meas_y'] is not None:
-                        meas_pose_msg = PoseStamped()
-                        meas_pose_msg.header = Header()
-                        meas_pose_msg.header.stamp = timestamp
-                        meas_pose_msg.header.frame_id = "map"
-                        
-                        meas_pose_msg.pose.position.x = float(row['meas_x'])
-                        meas_pose_msg.pose.position.y = float(row['meas_y'])
-                        meas_pose_msg.pose.position.z = 0.0
-                        meas_pose_msg.pose.orientation.x = 0.0
-                        meas_pose_msg.pose.orientation.y = 0.0
-                        meas_pose_msg.pose.orientation.z = 0.0
-                        meas_pose_msg.pose.orientation.w = 1.0
-                        
-                        meas_topic_name = f"{topic_prefix}/target_{track_id}/measurement"
-                        bag.write(meas_topic_name, meas_pose_msg, timestamp)
+            # 创建rosbag2写入器
+            storage_options = StorageOptions(
+                uri=str(output_path),
+                storage_id='sqlite3'
+            )
+            converter_options = ConverterOptions('', '')
+            writer = SequentialWriter()
+            writer.open(storage_options, converter_options)
             
-            print(f"✅ 数据已成功导出为ROS bag格式: {output_path}")
+            # 收集所有唯一的话题
+            topics_created = set()
+            
+            for row in data:
+                track_id = int(row['track_id'])
+                pose_topic = f"{topic_prefix}/target_{track_id}/pose"
+                meas_topic = f"{topic_prefix}/target_{track_id}/measurement"
+                
+                # 创建预测位置话题
+                if pose_topic not in topics_created:
+                    pose_topic_info = TopicMetadata(
+                        name=pose_topic,
+                        type='geometry_msgs/msg/PoseStamped',
+                        serialization_format='cdr'
+                    )
+                    writer.create_topic(pose_topic_info)
+                    topics_created.add(pose_topic)
+                
+                # 创建测量位置话题（如果有测量数据）
+                if row['meas_x'] is not None and row['meas_y'] is not None:
+                    if meas_topic not in topics_created:
+                        meas_topic_info = TopicMetadata(
+                            name=meas_topic,
+                            type='geometry_msgs/msg/PoseStamped',
+                            serialization_format='cdr'
+                        )
+                        writer.create_topic(meas_topic_info)
+                        topics_created.add(meas_topic)
+            
+            # 写入数据
+            for row in data:
+                # 创建时间戳（纳秒）
+                timestamp_ns = int(float(row['timestamp']) * 1e9)
+                
+                # 创建预测位置消息
+                pose_msg = PoseStamped()
+                pose_msg.header = Header()
+                pose_msg.header.stamp.sec = int(float(row['timestamp']))
+                pose_msg.header.stamp.nanosec = int((float(row['timestamp']) % 1) * 1e9)
+                pose_msg.header.frame_id = "map"
+                
+                pose_msg.pose.position.x = float(row['pred_x'])
+                pose_msg.pose.position.y = float(row['pred_y'])
+                pose_msg.pose.position.z = 0.0
+                pose_msg.pose.orientation.x = 0.0
+                pose_msg.pose.orientation.y = 0.0
+                pose_msg.pose.orientation.z = 0.0
+                pose_msg.pose.orientation.w = 1.0
+                
+                track_id = int(row['track_id'])
+                pose_topic = f"{topic_prefix}/target_{track_id}/pose"
+                
+                writer.write(pose_topic, serialize_message(pose_msg), timestamp_ns)
+                
+                # 如果有测量数据，写入测量位置
+                if row['meas_x'] is not None and row['meas_y'] is not None:
+                    meas_pose_msg = PoseStamped()
+                    meas_pose_msg.header = Header()
+                    meas_pose_msg.header.stamp.sec = int(float(row['timestamp']))
+                    meas_pose_msg.header.stamp.nanosec = int((float(row['timestamp']) % 1) * 1e9)
+                    meas_pose_msg.header.frame_id = "map"
+                    
+                    meas_pose_msg.pose.position.x = float(row['meas_x'])
+                    meas_pose_msg.pose.position.y = float(row['meas_y'])
+                    meas_pose_msg.pose.position.z = 0.0
+                    meas_pose_msg.pose.orientation.x = 0.0
+                    meas_pose_msg.pose.orientation.y = 0.0
+                    meas_pose_msg.pose.orientation.z = 0.0
+                    meas_pose_msg.pose.orientation.w = 1.0
+                    
+                    meas_topic = f"{topic_prefix}/target_{track_id}/measurement"
+                    writer.write(meas_topic, serialize_message(meas_pose_msg), timestamp_ns)
+            
+            print(f"✅ 数据已成功导出为ROS2 bag格式 (rosbag2): {output_path}")
             print(f"   包含 {len(data)} 条消息")
             print(f"   话题前缀: {topic_prefix}")
-            print(f"   消息类型: geometry_msgs/PoseStamped")
+            print(f"   消息类型: geometry_msgs/msg/PoseStamped")
+            print(f"   存储格式: SQLite3 (.db3)")
             return str(output_path)
             
         except Exception as e:
-            print(f"导出ROS bag时出错: {e}")
+            print(f"导出ROS2 bag时出错: {e}")
             import traceback
             traceback.print_exc()
             return None
     
     def _auto_export_rosbag(self):
-        """自动导出ROS bag格式（内部方法）"""
+        """自动导出ROS2 bag格式（内部方法）"""
         try:
             rosbag_path = self.export_to_rosbag()
             if rosbag_path:
-                print(f"已自动生成ROS bag文件: {rosbag_path}")
+                print(f"已自动生成ROS2 bag文件: {rosbag_path}")
             else:
-                print("未生成ROS bag文件（可能数据为空、出错或ROS环境未配置）")
+                print("未生成ROS2 bag文件（可能数据为空、出错或ROS2环境未配置）")
         except Exception as e:
-            print(f"自动导出ROS bag时出错: {e}")
+            print(f"自动导出ROS2 bag时出错: {e}")
     
     def __enter__(self):
         """上下文管理器入口"""
@@ -304,7 +341,7 @@ def create_ekf_datalogger(output_dir=".", filename_prefix="ekf_predictions", exp
     Args:
         output_dir: 输出目录路径
         filename_prefix: 文件名前缀
-        export_rosbag: 是否自动导出ROS bag格式（默认False）
+        export_rosbag: 是否自动导出ROS2 bag格式（默认False）
     
     Returns:
         EKFDatalogger实例
