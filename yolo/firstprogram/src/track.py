@@ -156,8 +156,9 @@ def main():
                     
                     # 绘制预测文本
                     cv2.putText(annotated_frame, f"ID:{track_id} Pred", 
-                               (int(box[0]), int(box[1]) - 10), 
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                    (int(box[0]), int(box[1]) + 20),  # 将文本位置向下移动20像素
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+
             
             # 显示和保存帧
             cv2.imshow("Armor Plate Detection with EKF Prediction", annotated_frame)
