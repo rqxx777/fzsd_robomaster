@@ -6,7 +6,7 @@ from ultralytics import YOLO
 os.makedirs('frames', exist_ok=True)
 
 # 打开视频文件
-cap = cv2.VideoCapture(os.path.expanduser('~/vscode/8.mp4'))  # 替换为你的视频文件路径
+cap = cv2.VideoCapture(os.path.expanduser('yolo/firstprogram/demo_vedio.mp4'))  # 替换为你的视频文件路径
 
 if not cap.isOpened():
     print("Error: Cannot open video file.")
