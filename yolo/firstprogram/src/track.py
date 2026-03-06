@@ -52,16 +52,92 @@ class EKF:
         
         return self.state[:2]
 
+class EKF3D:
+    """扩展卡尔曼滤波用于3D目标跟踪"""
+    def __init__(self, dt=1.0, process_noise=1.0, measurement_noise=10.0):
+        # 状态: [x, y, z, vx, vy, vz]
+        self.state = np.zeros(6)
+        self.covariance = np.eye(6) * 100  # 初始协方差
+        
+        # 状态转移矩阵 (匀速模型)
+        self.F = np.array([
+            [1, 0, 0, dt, 0, 0],
+            [0, 1, 0, 0, dt, 0],
+            [0, 0, 1, 0, 0, dt],
+            [0, 0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 1, 0],
+            [0, 0, 0, 0, 0, 1]
+        ])
+        
+        # 过程噪声协方差
+        self.Q = np.eye(6) * process_noise
+        
+        # 测量矩阵 (测量x, y, z)
+        self.H = np.array([
+            [1, 0, 0, 0, 0, 0],
+            [0, 1, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0, 0]
+        ])
+        
+        # 测量噪声协方差
+        self.R = np.eye(3) * measurement_noise
+        
+    def predict(self):
+        """预测步骤"""
+        self.state = self.F @ self.state
+        self.covariance = self.F @ self.covariance @ self.F.T + self.Q
+        return self.state[:3]  # 返回预测位置 (x, y, z)
+    
+    def update(self, measurement):
+        """更新步骤"""
+        # 测量值 (x, y, z)
+        z = np.array(measurement)
+        
+        # 计算卡尔曼增益
+        S = self.H @ self.covariance @ self.H.T + self.R
+        K = self.covariance @ self.H.T @ np.linalg.inv(S)
+        
+        # 更新状态和协方差
+        y = z - self.H @ self.state
+        self.state = self.state + K @ y
+        self.covariance = (np.eye(6) - K @ self.H) @ self.covariance
+        
+        return self.state[:3]
+
+def estimate_depth(box, frame_width, frame_height):
+    """
+    深度估计占位符函数
+    实际应用中应替换为真实的深度估计模型（如MiDaS、Depth Anything等）
+    或使用立体视觉、传感器融合等方法
+    
+    Args:
+        box: 边界框 [x1, y1, x2, y2]
+        frame_width: 帧宽度
+        frame_height: 帧高度
+        
+    Returns:
+        float: 估计的深度值（z坐标）
+    """
+    # 简单启发式：基于边界框大小估计深度（框越大，距离越近）
+    box_width = box[2] - box[0]
+    box_height = box[3] - box[1]
+    box_area = box_width * box_height
+    frame_area = frame_width * frame_height
+    
+    # 假设目标实际大小已知，这里使用简单比例
+    # 这里使用一个虚拟常数，实际需要校准
+    depth = 1000.0 / (box_area / frame_area + 0.001)  # 虚拟公式
+    
+    # 限制深度范围
+    depth = np.clip(depth, 0.1, 10000.0)
+    
+    return depth
+
 def main():
     import os
     current_dir = os.getcwd()
     print(f"当前工作目录: {current_dir}")
-    print(f"期望的目录: /home/xdc/fzsd_robomaster/yolo")
     
-    # 检查是否在正确的目录
-    if not current_dir.endswith("/yolo"):
-        print("警告：可能不在正确的目录运行！")
-        print("建议切换到: cd /home/xdc/fzsd_robomaster/yolo")
     
     # 加载训练好的模型 - 使用相对于yolo目录的路径
     model_path = "firstprogram/best.pt"
@@ -125,37 +201,43 @@ def main():
                 track_ids = results[0].boxes.id.cpu().numpy().astype(int)  # 跟踪ID
                 
                 for box, track_id in zip(boxes, track_ids):
-                    # 计算边界框中心
+                    # 计算边界框中心 (2D)
                     cx = (box[0] + box[2]) / 2
                     cy = (box[1] + box[3]) / 2
                     
-                    # 获取或创建该目标的EKF跟踪器
+                    # 估计深度 (z坐标)
+                    cz = estimate_depth(box, width, height)
+                    
+                    # 获取或创建该目标的3D EKF跟踪器
                     if track_id not in ekf_trackers:
-                        ekf_trackers[track_id] = EKF(dt=1.0/fps if fps > 0 else 1.0/30)
-                        # 初始化状态
-                        ekf_trackers[track_id].state = np.array([cx, cy, 0, 0])
+                        ekf_trackers[track_id] = EKF3D(dt=1.0/fps if fps > 0 else 1.0/30)
+                        # 初始化状态 [x, y, z, vx, vy, vz]
+                        ekf_trackers[track_id].state = np.array([cx, cy, cz, 0, 0, 0])
                     
-                    # 更新EKF
-                    ekf_trackers[track_id].update([cx, cy])
+                    # 更新EKF (使用3D测量值)
+                    ekf_trackers[track_id].update([cx, cy, cz])
                     
-                    # 预测下一帧位置
+                    # 预测下一帧位置 (3D)
                     predicted_pos = ekf_trackers[track_id].predict()
-                    pred_x, pred_y = predicted_pos
+                    pred_x, pred_y, pred_z = predicted_pos
                     
-                    # 记录预测数据到CSV文件
+                    # 记录预测数据到CSV文件 (包含3D坐标)
                     data_logger.log_prediction(
                         track_id=track_id,
                         pred_x=pred_x,
                         pred_y=pred_y,
+                        pred_z=pred_z,
                         meas_x=cx,
-                        meas_y=cy
+                        meas_y=cy,
+                        meas_z=cz
                     )
                     
-                    # 在帧上绘制预测位置 (红色圆点)
+                    # 在帧上绘制预测位置 (红色圆点) - 2D投影
                     cv2.circle(annotated_frame, (int(pred_x), int(pred_y)), 5, (0, 0, 255), -1)
                     
-                    # 绘制预测文本
-                    cv2.putText(annotated_frame, f"ID:{track_id} Pred", 
+                    # 绘制预测文本 (包含深度信息)
+                    depth_text = f"Z:{pred_z:.1f}"
+                    cv2.putText(annotated_frame, f"ID:{track_id} Pred {depth_text}", 
                     (int(box[0]), int(box[1]) + 20),  # 将文本位置向下移动20像素
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 

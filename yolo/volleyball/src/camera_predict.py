@@ -6,7 +6,7 @@ import numpy as np
 def main():
    #Load a pretrained YOLO model
     try:
-        model = YOLO("")  
+        model = YOLO("yolo/volleyball/runs/train/weights/volleyball.pt")  
         print("模型加载成功")
     except Exception as e:
         print(f"模型加载失败: {e}")

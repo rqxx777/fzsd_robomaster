@@ -34,8 +34,10 @@ class EKFDatalogger:
             'track_id',
             'pred_x',
             'pred_y',
+            'pred_z',
             'meas_x',
             'meas_y',
+            'meas_z',
             'frame_time'
         ])
         
@@ -46,16 +48,18 @@ class EKFDatalogger:
         if export_rosbag:
             print("ROS2 bag (rosbag2)导出功能已启用")
     
-    def log_prediction(self, track_id, pred_x, pred_y, meas_x=None, meas_y=None):
+    def log_prediction(self, track_id, pred_x, pred_y, pred_z=None, meas_x=None, meas_y=None, meas_z=None):
         """
-        记录一次预测数据
+        记录一次预测数据（支持3D坐标）
         
         Args:
             track_id: 目标跟踪ID
             pred_x: 预测的x坐标
             pred_y: 预测的y坐标
+            pred_z: 预测的z坐标（可选，3D跟踪时使用）
             meas_x: 实际测量的x坐标（可选）
             meas_y: 实际测量的y坐标（可选）
+            meas_z: 实际测量的z坐标（可选，3D跟踪时使用）
         """
         current_time = time.time()
         frame_time = current_time - self.start_time
@@ -66,8 +70,10 @@ class EKFDatalogger:
             track_id,
             pred_x,
             pred_y,
+            pred_z if pred_z is not None else '',
             meas_x if meas_x is not None else '',
             meas_y if meas_y is not None else '',
+            meas_z if meas_z is not None else '',
             frame_time
         ])
         
@@ -269,9 +275,14 @@ class EKFDatalogger:
                 pose_msg.header.stamp.nanosec = int((float(row['timestamp']) % 1) * 1e9)
                 pose_msg.header.frame_id = "map"
                 
+                # 读取预测的z坐标（如果存在）
+                pred_z = 0.0
+                if 'pred_z' in row and row['pred_z'] is not None and row['pred_z'] != '':
+                    pred_z = float(row['pred_z'])
+                
                 pose_msg.pose.position.x = float(row['pred_x'])
                 pose_msg.pose.position.y = float(row['pred_y'])
-                pose_msg.pose.position.z = 0.0
+                pose_msg.pose.position.z = pred_z
                 pose_msg.pose.orientation.x = 0.0
                 pose_msg.pose.orientation.y = 0.0
                 pose_msg.pose.orientation.z = 0.0
@@ -284,6 +295,11 @@ class EKFDatalogger:
                 
                 # 如果有测量数据，写入测量位置
                 if row['meas_x'] is not None and row['meas_y'] is not None:
+                    # 读取测量的z坐标（如果存在）
+                    meas_z = 0.0
+                    if 'meas_z' in row and row['meas_z'] is not None and row['meas_z'] != '':
+                        meas_z = float(row['meas_z'])
+                    
                     meas_pose_msg = PoseStamped()
                     meas_pose_msg.header = Header()
                     meas_pose_msg.header.stamp.sec = int(float(row['timestamp']))
@@ -292,7 +308,7 @@ class EKFDatalogger:
                     
                     meas_pose_msg.pose.position.x = float(row['meas_x'])
                     meas_pose_msg.pose.position.y = float(row['meas_y'])
-                    meas_pose_msg.pose.position.z = 0.0
+                    meas_pose_msg.pose.position.z = meas_z
                     meas_pose_msg.pose.orientation.x = 0.0
                     meas_pose_msg.pose.orientation.y = 0.0
                     meas_pose_msg.pose.orientation.z = 0.0
