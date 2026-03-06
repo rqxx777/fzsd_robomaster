@@ -140,13 +140,13 @@ def main():
     
     
     # 加载训练好的模型 - 使用相对于yolo目录的路径
-    model_path = "firstprogram/best.pt"
+    model_path = "yolo/firstprogram/armor.pt"
     print(f"加载模型: {model_path}")
     model = YOLO(model_path)
     
     # 视频路径 - 使用相对于yolo目录的路径
-    video_path = "firstprogram/demo_vedio.mp4"
-    output_path = "firstprogram/src/detected_demo.mp4"  # 输出到src目录
+    video_path = "yolo/firstprogram/demo_vedio.mp4"
+    output_path = "yolo/firstprogram/src/detected_demo.mp4" 
     
     print(f"输入视频: {video_path}")
     print(f"输出视频: {output_path}")
