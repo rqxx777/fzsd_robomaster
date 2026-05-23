@@ -1,0 +1,10 @@
+/**:
+  ros__parameters:
+   
+    max_hp: 500
+    max_ammo: 100
+    heat_limit: 240
+
+    preparation_time: 60
+    self_check_time: 5
+    running_time: 300
