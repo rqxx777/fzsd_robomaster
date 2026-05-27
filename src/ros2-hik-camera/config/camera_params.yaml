@@ -1,0 +1,7 @@
+/hik_camera:
+# 海康相机采集参数: 曝光时间和增益
+  ros__parameters:
+    camera_name: Hik_03
+
+    exposure_time: 8000
+    gain: 7.0

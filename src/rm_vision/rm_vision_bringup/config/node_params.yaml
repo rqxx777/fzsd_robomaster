@@ -1,0 +1,95 @@
+/camera_node:
+# 各 ROS2 节点参数配置 (camera, serial, detector, tracker, attacker)
+  ros__parameters:
+    camera_info_url: package://rm_vision_bringup/config/camera_info.yaml
+    exposure_time: 3000
+    gain: 12.0
+
+/serial_driver:
+  ros__parameters:
+    timestamp_offset: 0.006
+    device_name: /dev/ttyACM0
+    baud_rate: 115200
+    flow_control: none
+    parity: none
+    stop_bits: "1"
+
+/armor_detector:
+  ros__parameters:
+    debug: true
+
+    detect_color: 1   #1是打蓝   0 是打红    改完记得再编译一下，以免不生效
+    binary_thres: 80
+
+    # YOLO 参数
+    yolo:
+    
+      score_threshold: 0.5    #模型输出置信度筛选，降低后远距离小目标更容易通过
+      nms_threshold: 0.3     #防止同一个装甲板被重复检测。值越大，越容易保留重叠框；值越小，过滤越严格。
+      min_confidence: 0.5    # 默认0.8，降低可增加远距离识别
+
+    light.min_ratio: 0.1
+    armor.min_light_ratio: 0.8
+
+    classifier_threshold: 0.8
+    ignore_classes: ["negative"]
+
+/armor_tracker:
+  ros__parameters:
+    aim_target_frame: aim_odom
+    max_armor_distance: 10.0
+
+    ekf:
+      sigma2_q_xyz_max: 5e-3
+      sigma2_q_xyz_min: 1e-3
+
+      sigma2_q_yaw_max: 8e-3
+      sigma2_q_yaw_min: 4e-3
+
+      sigma2_q_r: 80.0
+      r_xyz_factor: 4e-3
+      r_yaw: 3e-1
+
+    tracker:
+      max_match_distance: 0.5
+      max_match_yaw_diff: 1.0
+
+      tracking_thres: 5
+      lost_time_thres: 0.2
+      lead_time: 0.01
+
+/vision_attacker:
+  ros__parameters:
+    trajectory:
+      lag_time: 0.01
+      air_k: 0.03
+      yaw_fix: 1.5
+      pitch_fix: 0.0
+      pitch_fix_per_meter: -0.001     #-0.25   #pitch的动态补偿，单位是度/米，负值表示目标越远需要补偿的角度越大
+      pitch_fix_min: -1.3
+    fire_ctrl:
+      car_attack_threshold: 1.5   #火控角度默认值
+      yaw_attack_threshold: 0.8   # yaw 火控角度
+      pitch_attack_threshold: 1.0 # pitch 火控角度
+      outpost_attack_threshold: 5.0
+      threshold_fix: 0.0
+
+    solver :
+      max_yaw_acc: 100.0
+      Q_yaw: [9e6, 0.0]
+      R_yaw: [1.0]
+
+      max_pitch_acc: 100.0
+      Q_pitch: [9e6, 0.0]
+      R_pitch: [1.0]
+
+    planner:
+      yaw_offset: 0.0 # degree 
+      pitch_offset: 0.0 # degree 
+      fire_thresh: 0.08
+      comming_angle: 60.0 # degree
+      leaving_angle: 20.0 # degree
+      decision_speed: 8.0 # rad/s
+      high_speed_delay_time: 0.01 # s
+      low_speed_delay_time: 0.01 # s
+    

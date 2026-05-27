@@ -1,0 +1,27 @@
+image_width: 1440
+# 海康相机内参 (需根据实际相机标定结果修改)
+image_height: 1080
+camera_name: hik_camera
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [1796.38196,    0.     ,  711.41289,
+            0.     , 1794.89503,  549.3758 ,
+            0.     ,    0.     ,    1.     ]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [-0.086403, 0.159174, -0.000768, 0.001301, 0.000000]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1., 0., 0.,
+         0., 1., 0.,
+         0., 0., 1.]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [1777.46338,    0.     ,  711.98204,    0.     ,
+            0.     , 1781.48071,  548.5844 ,    0.     ,
+            0.     ,    0.     ,    1.     ,    0.     ]

@@ -1,0 +1,11 @@
+camera: hik
+# 启动参数: 相机类型、坐标系变换、日志级别
+
+odom2camera:
+  xyz: "\"0.15 -0.05  0.0\""
+  rpy: "\"0.0  0.0  0.0\""
+
+detector_log_level: INFO
+tracker_log_level: INFO
+serial_log_level: INFO
+# auto_record_log_level: INFO
